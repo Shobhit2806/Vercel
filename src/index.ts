@@ -7,8 +7,6 @@ app.use(express.json());
 
 app.post("/deploy",(req,res)=>{
     const repoUrl = req.body.repoUrl;
-    console.log(repoUrl);
-
     res.json({})
 })
 
