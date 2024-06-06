@@ -5,6 +5,12 @@ import { simpleGit } from "simple-git";
 import { generateRandomId } from "./utils/generateRandomId";
 import { getAllFiles } from "./utils/getAllFiles";
 import { uploadFile } from "./utils/aws";
+import { createClient } from "redis";
+
+const publisher = createClient();
+publisher.connect();
+
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -19,6 +25,8 @@ app.post("/deploy", async (req, res) => {
     await uploadFile(file.slice(__dirname.length + 1), file);
   });
 
+  publisher.lPush("build-queue", id);
+  
   console.log(files);
   
   res.json({
