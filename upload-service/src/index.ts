@@ -32,10 +32,21 @@ app.post("/deploy", async (req, res) => {
   await simpleGit().clone(repoUrl, path.join(__dirname, `output/${id}`));
 
   const files = getAllFiles(path.join(__dirname, `output/${id}`));
-  files.forEach(async (file) => {
-    await uploadFile(file.slice(__dirname.length + 1), file);
-  });
+  
+  // files.forEach(async (file) => {
+  //   await uploadFile(file.slice(__dirname.length + 1), file);
+  // });
 
+  // @ts-ignore
+  const uploadFiles = async (files) => {
+    // @ts-ignore
+    const uploadPromises = files.map(async (file) => {
+      await uploadFile(file.slice(__dirname.length + 1), file);
+    });
+  
+    await Promise.all(uploadPromises);
+  };
+  uploadFiles(files);
   publisher.lPush("build-queue", id);
   publisher.hSet("status", id, "uploaded");
   console.log(files);
